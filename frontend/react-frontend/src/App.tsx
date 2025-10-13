@@ -223,79 +223,70 @@ function App() {
       <motion.header 
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50"
+        className="header"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <motion.div 
-              className="flex items-center space-x-3"
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-                <FileText className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Resume Optimizer
-                </h1>
-                <p className="text-xs text-gray-500">AI-Powered Resume Enhancement</p>
-              </div>
-            </motion.div>
+        <div className="header-content">
+          <motion.div 
+            className="logo"
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="logo-icon">
+              <FileText size={24} />
+            </div>
+            <div className="logo-text">
+              <h1>Resume Optimizer</h1>
+              <p>AI-Powered Resume Enhancement</p>
+            </div>
+          </motion.div>
 
-            {/* Connection Status */}
-            <motion.div 
-              className="flex items-center space-x-2"
-              animate={{ scale: isConnected ? 1 : 1.1 }}
-            >
-              {isConnected ? (
-                <div className="flex items-center space-x-1 text-green-600">
-                  <Wifi className="h-4 w-4" />
-                  <span className="text-sm">Connected</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-1 text-red-600">
-                  <WifiOff className="h-4 w-4" />
-                  <span className="text-sm">Offline</span>
-                </div>
-              )}
-            </motion.div>
-          </div>
+          {/* Connection Status */}
+          <motion.div 
+            className={`status ${isConnected ? 'connected' : 'offline'}`}
+            animate={{ scale: isConnected ? 1 : 1.1 }}
+          >
+            {isConnected ? (
+              <>
+                <Wifi size={16} />
+                <span>Connected</span>
+              </>
+            ) : (
+              <>
+                <WifiOff size={16} />
+                <span>Offline</span>
+              </>
+            )}
+          </motion.div>
         </div>
       </motion.header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="container">
+        <div className="main-grid">
           
           {/* Sidebar */}
           <motion.div 
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="lg:col-span-1"
           >
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6 sticky top-24">
+            <div className="sidebar">
               
               {/* Upload Section */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Upload className="h-5 w-5 mr-2 text-blue-600" />
+              <div style={{ marginBottom: '32px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Upload size={20} style={{ color: '#3b82f6' }} />
                   Upload Resume
                 </h3>
                 
                 <div
                   {...getRootProps()}
-                  className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-300 ${
-                    isDragActive 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
-                  }`}
+                  className={`upload-area ${isDragActive ? 'drag-active' : ''}`}
                 >
                   <input {...getInputProps()} />
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-600">
+                  <Upload className="upload-icon" size={32} />
+                  <p className="upload-text">
                     {isDragActive ? 'Drop your resume here' : 'Click or drag to upload'}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">PDF or DOCX (max 10MB)</p>
+                  <p className="upload-subtext">PDF or DOCX (max 10MB)</p>
                 </div>
 
                 {/* Upload Progress */}
@@ -305,17 +296,23 @@ function App() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mt-4"
+                      style={{ marginTop: '16px' }}
                     >
-                      <div className="bg-gray-200 rounded-full h-2">
+                      <div style={{ background: '#e5e7eb', borderRadius: '9999px', height: '8px' }}>
                         <motion.div
-                          className="bg-blue-600 h-2 rounded-full"
+                          style={{ 
+                            background: '#3b82f6', 
+                            height: '8px', 
+                            borderRadius: '9999px' 
+                          }}
                           initial={{ width: 0 }}
                           animate={{ width: `${uploadProgress}%` }}
                           transition={{ duration: 0.3 }}
                         />
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">{uploadProgress}% uploaded</p>
+                      <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                        {uploadProgress}% uploaded
+                      </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -324,37 +321,33 @@ function App() {
               {/* Version History */}
               {session.resumeVersions.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <History className="h-5 w-5 mr-2 text-blue-600" />
+                  <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <History size={20} style={{ color: '#3b82f6' }} />
                     Version History
                   </h3>
                   
-                  <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                  <div style={{ maxHeight: '256px', overflowY: 'auto' }} className="custom-scrollbar">
                     {session.resumeVersions.map((version, index) => (
                       <motion.div
                         key={version.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                          index === session.currentVersion
-                            ? 'bg-blue-100 border-2 border-blue-300'
-                            : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                        }`}
+                        className={`version-item ${index === session.currentVersion ? 'active' : ''}`}
                         onClick={() => switchToVersion(index)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Version {index + 1}</span>
+                        <div className="version-header">
+                          <span className="version-title">Version {index + 1}</span>
                           {index === session.currentVersion && (
-                            <CheckCircle className="h-4 w-4 text-blue-600" />
+                            <CheckCircle size={16} style={{ color: '#3b82f6' }} />
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 mt-1 truncate">
+                        <p className="version-desc">
                           {version.description}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="version-date">
                           {new Date(version.timestamp).toLocaleDateString()}
                         </p>
                       </motion.div>
@@ -379,10 +372,10 @@ function App() {
                   initial={{ opacity: 0, y: -50 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -50 }}
-                  className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center"
+                  className="notification error"
                 >
-                  <AlertCircle className="h-5 w-5 text-red-600 mr-3" />
-                  <p className="text-red-800">{error}</p>
+                  <AlertCircle size={20} />
+                  <p>{error}</p>
                 </motion.div>
               )}
 
@@ -391,43 +384,37 @@ function App() {
                   initial={{ opacity: 0, y: -50 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -50 }}
-                  className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center"
+                  className="notification success"
                 >
-                  <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
-                  <p className="text-green-800">{success}</p>
+                  <CheckCircle size={20} />
+                  <p>{success}</p>
                 </motion.div>
               )}
             </AnimatePresence>
 
             {/* Tab Navigation */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-              <div className="border-b border-gray-200">
-                <nav className="flex">
-                  {[
-                    { id: 'chat', label: 'AI Assistant', icon: MessageCircle },
-                    { id: 'resume', label: 'Current Resume', icon: FileText },
-                    { id: 'versions', label: 'Compare Versions', icon: History },
-                  ].map((tab) => (
-                    <motion.button
-                      key={tab.id}
-                      className={`flex-1 px-6 py-4 text-sm font-medium flex items-center justify-center space-x-2 transition-all duration-200 ${
-                        activeTab === tab.id
-                          ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                      }`}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ y: 0 }}
-                    >
-                      <tab.icon className="h-4 w-4" />
-                      <span>{tab.label}</span>
-                    </motion.button>
-                  ))}
-                </nav>
+            <div className="tabs">
+              <div className="tab-nav">
+                {[
+                  { id: 'chat', label: 'AI Assistant', icon: MessageCircle },
+                  { id: 'resume', label: 'Current Resume', icon: FileText },
+                  { id: 'versions', label: 'Compare Versions', icon: History },
+                ].map((tab) => (
+                  <motion.button
+                    key={tab.id}
+                    className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 0 }}
+                  >
+                    <tab.icon size={16} />
+                    <span>{tab.label}</span>
+                  </motion.button>
+                ))}
               </div>
 
               {/* Tab Content */}
-              <div className="p-6">
+              <div className="tab-content">
                 <AnimatePresence mode="wait">
                   
                   {/* Chat Tab */}
@@ -444,15 +431,13 @@ function App() {
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="text-center py-12"
+                          className="welcome"
                         >
-                          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                            <Sparkles className="h-8 w-8 text-white" />
+                          <div className="welcome-icon">
+                            <Sparkles size={32} />
                           </div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                            Welcome to AI Resume Optimizer
-                          </h3>
-                          <p className="text-gray-600 max-w-md mx-auto">
+                          <h3>Welcome to AI Resume Optimizer</h3>
+                          <p>
                             Upload your resume and start chatting with our AI assistant to enhance it, 
                             match it to jobs, or optimize it for specific companies.
                           </p>
@@ -460,42 +445,30 @@ function App() {
                       )}
 
                       {/* Chat Messages */}
-                      <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
+                      <div className="chat-messages">
                         {session.messages.map((message, index) => (
                           <motion.div
                             key={message.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`message ${message.role}`}
                           >
-                            <div className={`flex items-start space-x-3 max-w-3xl ${
-                              message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-                            }`}>
-                              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                message.role === 'user' 
-                                  ? 'bg-blue-600' 
-                                  : 'bg-gradient-to-r from-purple-500 to-pink-500'
-                              }`}>
+                            <div className="message-content">
+                              <div className="message-avatar">
                                 {message.role === 'user' ? (
-                                  <User className="h-4 w-4 text-white" />
+                                  <User size={16} />
                                 ) : (
-                                  <Bot className="h-4 w-4 text-white" />
+                                  <Bot size={16} />
                                 )}
                               </div>
                               
-                              <div className={`rounded-2xl px-4 py-3 ${
-                                message.role === 'user'
-                                  ? 'bg-blue-600 text-white'
-                                  : 'bg-gray-100 text-gray-900'
-                              }`}>
-                                <div className="prose prose-sm max-w-none">
-                                  <ReactMarkdown>
-                                    {message.content}
-                                  </ReactMarkdown>
-                                </div>
+                              <div className="message-bubble">
+                                <ReactMarkdown>
+                                  {message.content}
+                                </ReactMarkdown>
                                 {message.intent && (
-                                  <div className="mt-2 text-xs opacity-70">
+                                  <div style={{ marginTop: '8px', fontSize: '11px', opacity: 0.7 }}>
                                     Intent: {message.intent}
                                   </div>
                                 )}
@@ -511,14 +484,14 @@ function App() {
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -20 }}
-                              className="flex justify-start"
+                              className="message assistant"
                             >
-                              <div className="flex items-start space-x-3">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                                  <Bot className="h-4 w-4 text-white" />
+                              <div className="message-content">
+                                <div className="message-avatar">
+                                  <Bot size={16} />
                                 </div>
-                                <div className="bg-gray-100 rounded-2xl px-4 py-3">
-                                  <div className="flex space-x-1">
+                                <div className="message-bubble">
+                                  <div style={{ display: 'flex', gap: '4px' }}>
                                     <div className="typing-indicator"></div>
                                     <div className="typing-indicator"></div>
                                     <div className="typing-indicator"></div>
@@ -531,20 +504,29 @@ function App() {
                       </div>
 
                       {/* Chat Input */}
-                      <div className="flex space-x-4">
-                        <div className="flex-1 relative">
+                      <div className="chat-input">
+                        <div style={{ flex: 1, position: 'relative' }}>
                           <input
                             type="text"
                             value={chatInput}
                             onChange={(e) => setChatInput(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                             placeholder="Ask me to enhance your resume, match it to a job, or optimize for a company..."
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
                             disabled={isLoading || !session.resumeContent}
                           />
                           {!session.resumeContent && (
-                            <div className="absolute inset-0 bg-gray-100 bg-opacity-75 rounded-xl flex items-center justify-center">
-                              <p className="text-sm text-gray-500">Upload a resume to start chatting</p>
+                            <div style={{ 
+                              position: 'absolute', 
+                              inset: 0, 
+                              background: 'rgba(243, 244, 246, 0.75)', 
+                              borderRadius: '15px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}>
+                              <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                                Upload a resume to start chatting
+                              </p>
                             </div>
                           )}
                         </div>
@@ -552,14 +534,14 @@ function App() {
                         <motion.button
                           onClick={handleSendMessage}
                           disabled={!chatInput.trim() || isLoading || !session.resumeContent}
-                          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
+                          className="send-button"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
                           {isLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 size={16} className="animate-spin" />
                           ) : (
-                            <Send className="h-4 w-4" />
+                            <Send size={16} />
                           )}
                           <span>Send</span>
                         </motion.button>
@@ -567,7 +549,7 @@ function App() {
 
                       {/* Quick Actions */}
                       {session.resumeContent && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="quick-actions">
                           {[
                             { label: 'General Enhancement', message: 'Please enhance my resume overall' },
                             { label: 'Optimize for Google', message: 'Optimize my resume for Google' },
@@ -576,15 +558,15 @@ function App() {
                             <motion.button
                               key={action.label}
                               onClick={() => setChatInput(action.message)}
-                              className="p-3 text-sm bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200 text-left"
+                              className="quick-action"
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.1 }}
                             >
-                              <Sparkles className="h-4 w-4 text-blue-600 mb-1" />
-                              <div className="font-medium text-gray-900">{action.label}</div>
+                              <Sparkles className="quick-action-icon" size={16} />
+                              <div className="quick-action-title">{action.label}</div>
                             </motion.button>
                           ))}
                         </div>
@@ -599,16 +581,15 @@ function App() {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
-                      className="space-y-6"
                     >
                       {session.resumeContent ? (
                         <>
                           {/* Resume Header */}
-                          <div className="flex justify-between items-center">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                             <div>
-                              <h3 className="text-lg font-semibold">Current Resume</h3>
+                              <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>Current Resume</h3>
                               {session.currentVersion >= 0 && (
-                                <p className="text-sm text-gray-500">
+                                <p style={{ fontSize: '14px', color: '#6b7280' }}>
                                   Version {session.currentVersion + 1} - {
                                     session.resumeVersions[session.currentVersion]?.description
                                   }
@@ -616,36 +597,34 @@ function App() {
                               )}
                             </div>
                             
-                            <div className="flex space-x-3">
-                              <motion.button
-                                onClick={handleDownloadPDF}
-                                disabled={isLoading}
-                                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all duration-200 flex items-center space-x-2"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                              >
-                                {isLoading ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Download className="h-4 w-4" />
-                                )}
-                                <span>Professional PDF</span>
-                              </motion.button>
-                            </div>
+                            <motion.button
+                              onClick={handleDownloadPDF}
+                              disabled={isLoading}
+                              className="download-button"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              {isLoading ? (
+                                <Loader2 size={16} className="animate-spin" />
+                              ) : (
+                                <Download size={16} />
+                              )}
+                              <span>Professional PDF</span>
+                            </motion.button>
                           </div>
 
                           {/* Resume Content */}
-                          <div className="bg-white rounded-lg border border-gray-200 p-6">
-                            <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800 leading-relaxed">
+                          <div className="resume-content">
+                            <pre>
                               {session.resumeContent}
                             </pre>
                           </div>
                         </>
                       ) : (
-                        <div className="text-center py-12">
-                          <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Resume Uploaded</h3>
-                          <p className="text-gray-600">Upload a resume to view and edit it here.</p>
+                        <div className="welcome">
+                          <FileText size={64} style={{ color: '#d1d5db', margin: '0 auto 16px' }} />
+                          <h3>No Resume Uploaded</h3>
+                          <p>Upload a resume to view and edit it here.</p>
                         </div>
                       )}
                     </motion.div>
@@ -658,29 +637,39 @@ function App() {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
-                      className="space-y-6"
                     >
                       {session.resumeVersions.length > 1 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                           {session.resumeVersions.slice(-2).map((version, index) => (
                             <motion.div
                               key={version.id}
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.1 }}
-                              className="bg-white rounded-lg border border-gray-200 p-4"
+                              className="card"
                             >
-                              <div className="flex justify-between items-center mb-3">
-                                <h4 className="font-semibold">
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <h4 style={{ fontWeight: '600' }}>
                                   Version {session.resumeVersions.length - 1 + index}
                                 </h4>
-                                <span className="text-xs text-gray-500">
+                                <span style={{ fontSize: '12px', color: '#6b7280' }}>
                                   {new Date(version.timestamp).toLocaleDateString()}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-600 mb-3">{version.description}</p>
-                              <div className="bg-gray-50 rounded p-3 max-h-64 overflow-y-auto custom-scrollbar">
-                                <pre className="whitespace-pre-wrap text-xs text-gray-700">
+                              <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '12px' }}>{version.description}</p>
+                              <div style={{ 
+                                background: '#f9fafb', 
+                                borderRadius: '8px', 
+                                padding: '12px', 
+                                maxHeight: '256px', 
+                                overflowY: 'auto' 
+                              }} className="custom-scrollbar">
+                                <pre style={{ 
+                                  whiteSpace: 'pre-wrap', 
+                                  fontSize: '12px', 
+                                  color: '#374151',
+                                  margin: 0
+                                }}>
                                   {version.content.substring(0, 500)}...
                                 </pre>
                               </div>
@@ -688,10 +677,10 @@ function App() {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-12">
-                          <History className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Versions to Compare</h3>
-                          <p className="text-gray-600">
+                        <div className="welcome">
+                          <History size={64} style={{ color: '#d1d5db', margin: '0 auto 16px' }} />
+                          <h3>No Versions to Compare</h3>
+                          <p>
                             Create multiple resume versions through enhancements to compare them here.
                           </p>
                         </div>

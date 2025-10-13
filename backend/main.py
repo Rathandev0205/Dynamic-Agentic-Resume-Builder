@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel
 from typing import Optional
@@ -9,6 +10,20 @@ from workflow.chains import latex_conversion_chain
 from utils.latex_compiler import compile_latex_to_pdf, is_latex_available
 
 app = FastAPI(title="Resume Optimization API")
+
+# Add CORS middleware to allow React frontend to communicate with backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React development server
+        "http://127.0.0.1:3000",  # Alternative localhost
+        "http://localhost:3001",  # In case React runs on different port
+        "http://localhost:3002",  # In case React runs on different port
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 class ChatRequest(BaseModel):
     user_id: str

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Simple CSS without Tailwind for now */
 * {
   margin: 0;
