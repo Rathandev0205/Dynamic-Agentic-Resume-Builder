@@ -1,0 +1,308 @@
+# =============================================================================
+# Resume Optimization Project - Complete .gitignore
+# =============================================================================
+
+# Python Backend
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+backend/.venv/
+backend/venv/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+resume_agent.db
+backend/resume_agent.db
+backend/*.db
+
+# Python Testing
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# React Frontend
+# =============================================================================
+# Dependencies
+node_modules/
+frontend/react-frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Production builds
+build/
+dist/
+frontend/react-frontend/build/
+frontend/react-frontend/dist/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# Next.js build output (if used)
+.next
+out
+
+# Gatsby files (if used)
+public
+
+# Vuepress build output (if used)
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# LaTeX & PDF Generation
+# =============================================================================
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.out
+*.nav
+*.snm
+*.vrb
+*.log
+*.bbl
+*.blg
+*.idx
+*.ind
+*.ilg
+*.lot
+*.lof
+
+# Temporary LaTeX files
+/tmp/
+temp/
+*.tmp
+
+# IDE & Editor Files
+# =============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS Generated Files
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Project Specific
+# =============================================================================
+# Uploaded resume files (keep sample files but ignore user uploads)
+uploads/
+user_uploads/
+Resume_*.pdf
+resume_*.pdf
+*.docx
+*.doc
+
+# Logs
+logs/
+*.log
+backend/logs/
+frontend/logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Test files and directories
+test_uploads/
+test_files/
+__tests__/
+tests/
+
+# Configuration overrides (keep templates, ignore local configs)
+config.local.json
+settings.local.json
+
+# Session storage (if file-based)
+sessions/
+.sessions/
+
+# API Keys and Secrets (double protection)
+secrets.json
+api_keys.json
+*.key
+*.pem
+
+# Development tools
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Package manager locks (optional - uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# poetry.lock
+
+# Documentation builds
+docs/_build/
+docs/build/
+
+# Streamlit specific
+.streamlit/
+
+# FastAPI specific
+.pytest_cache/
+
+# LangChain/LangGraph specific
+.langchain/
+.langgraph/
+
+# AI Model files (if storing locally)
+models/
+*.model
+*.pkl
+*.joblib
+
+# Checkpoints and saved states
+checkpoints/
+.checkpoints/
+state/
+.state/
+
+# Performance profiling
+*.prof
+profile_*
+
+# Security
+.secrets/
+credentials/
