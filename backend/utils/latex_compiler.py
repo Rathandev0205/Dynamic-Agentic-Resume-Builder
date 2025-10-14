@@ -40,16 +40,56 @@ def compile_latex_to_pdf(latex_content: str) -> bytes:
                     str(tex_file)
                 ], 
                 capture_output=True, 
-                text=True,
                 cwd=temp_path
                 )
                 
+                # Handle encoding properly for international characters
+                try:
+                    stdout = result.stdout.decode('utf-8', errors='replace') if result.stdout else ""
+                    stderr = result.stderr.decode('utf-8', errors='replace') if result.stderr else ""
+                except (UnicodeDecodeError, AttributeError):
+                    # Fallback to latin1 encoding if UTF-8 fails
+                    try:
+                        stdout = result.stdout.decode('latin1', errors='replace') if result.stdout else ""
+                        stderr = result.stderr.decode('latin1', errors='replace') if result.stderr else ""
+                    except (UnicodeDecodeError, AttributeError):
+                        stdout = str(result.stdout) if result.stdout else ""
+                        stderr = str(result.stderr) if result.stderr else ""
+                
+                # Check if PDF was generated successfully, even if there were warnings
+                pdf_file = temp_path / "resume.pdf"
+                
                 if result.returncode != 0:
-                    logger.error(f"LaTeX compilation failed (run {i+1}): {result.stderr}")
-                    if i == 0:  # Try once more
-                        continue
+                    error_msg = stderr or stdout or "Unknown LaTeX error"
+                    logger.warning(f"LaTeX compilation warnings (run {i+1}): {error_msg}")
+                    
+                    # Check if PDF was still generated despite warnings
+                    if pdf_file.exists():
+                        logger.info(f"PDF generated successfully despite warnings on run {i+1}")
+                        break  # PDF exists, we can proceed
                     else:
-                        raise Exception(f"LaTeX compilation failed: {result.stderr}")
+                        # No PDF generated, this is a real error
+                        logger.error(f"LaTeX compilation failed (run {i+1}): {error_msg}")
+                        
+                        # Also check for .log file which contains detailed errors
+                        log_file = temp_path / "resume.log"
+                        if log_file.exists():
+                            try:
+                                with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
+                                    log_content = f.read()
+                                    logger.error(f"LaTeX log file content: {log_content[-1000:]}")  # Last 1000 chars
+                                    error_msg += f"\nLog file: {log_content[-500:]}"  # Include some log content
+                            except Exception as log_error:
+                                logger.error(f"Could not read log file: {log_error}")
+                        
+                        if i == 0:  # Try once more
+                            continue
+                        else:
+                            raise Exception(f"LaTeX compilation failed: {error_msg}")
+                else:
+                    # Successful compilation
+                    logger.info(f"LaTeX compilation successful on run {i+1}")
+                    break
             
             # Read the generated PDF
             pdf_file = temp_path / "resume.pdf"

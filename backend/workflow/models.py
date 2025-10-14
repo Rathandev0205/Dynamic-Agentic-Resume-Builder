@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List
 
 class IntentResponse(BaseModel):
-    intent: str = Field(description="Classified intent: job_matching, enhancement, or company_research")
+    intent: str = Field(description="Classified intent: job_matching, enhancement, company_research, translation")
     confidence: float = Field(description="Confidence score 0-1")
     reasoning: str = Field(description="Brief explanation of classification")
 
@@ -25,3 +25,6 @@ class ResearchResponse(BaseModel):
     optimization_strategy: str = Field(description="Tailoring approach for this company")
     optimized_content: str = Field(description="Company-optimized resume content")
     key_alignments: List[str] = Field(description="How resume aligns with company")
+
+class TranslateResponse(BaseModel):
+    translated_content: str = Field(description="Translated resume content")

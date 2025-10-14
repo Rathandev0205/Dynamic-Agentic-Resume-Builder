@@ -6,6 +6,7 @@ Key Capabilities:
 - Job Matching: Analyze job descriptions and optimize resume alignment
 - Content Enhancement: Improve resume sections with quantifiable achievements
 - Company Research: Tailor resumes for specific companies and cultures
+- Resume Translation: Tailor and translate resumes for specific language and culture  
 
 Guidelines:
 - Always provide actionable, specific recommendations
@@ -29,6 +30,7 @@ You must provide a structured response with these specific fields:
    - job_matching: User wants to match resume to a specific job description
    - enhancement: User wants to improve specific resume sections or overall quality  
    - company_research: User wants to optimize resume for a specific company
+   - translation: User wants to translate the resume to a specific language
 
 2. confidence: A decimal number between 0.0 and 1.0 representing your confidence in the classification
 
@@ -38,21 +40,28 @@ Analyze the user's query carefully to determine their primary intent.
 """
 
 job_matching_prompt = """
-Analyze this resume against the provided job description:
+You are a senior career strategist and ATS optimization expert. Analyze this resume against the job description and provide both analysis AND an optimized version of the resume.
 
-Resume: {resume_content}
-Job Description: {job_description}
-User Request: {user_query}
+RESUME TO ANALYZE & OPTIMIZE:
+{resume_content}
+
+JOB DESCRIPTION: {job_description}
+USER REQUEST: {user_query}
+
+TASK: 
+1. Analyze the match between resume and job requirements
+2. Optimize the resume content to better align with the job description
+3. Focus on ATS keywords, quantifiable achievements, and job-specific alignment
 
 You must provide a structured response with these specific fields:
 
 1. match_score: An integer from 0-100 representing the percentage match
 2. key_strengths: A list of specific strengths that align with the job (e.g., ["5+ years Python experience", "Leadership in agile teams"])
 3. skill_gaps: A list of missing skills or requirements (e.g., ["Docker containerization", "AWS certification"])
-4. optimized_sections: A dictionary with improved resume sections (e.g., {{"skills": "Enhanced skills section", "experience": "Improved experience descriptions"}})
+4. optimized_sections: A dictionary with improved resume sections that better match the job requirements. Include the COMPLETE optimized content for each section, not just descriptions. Example: {{"skills": "TECHNICAL SKILLS\n• Python (5+ years) - Django, Flask, FastAPI\n• Machine Learning - TensorFlow, PyTorch, Scikit-learn\n• Cloud Platforms - AWS (EC2, S3, Lambda), Docker, Kubernetes", "experience": "SENIOR SOFTWARE ENGINEER | Tech Corp | 2020-Present\n• Architected scalable microservices handling 1M+ daily requests using Python and AWS\n• Led cross-functional team of 8 developers in agile environment\n• Implemented ML models that improved user engagement by 35%"}}
 5. recommendations: A list of specific actionable recommendations (e.g., ["Add Docker projects to portfolio", "Quantify team leadership achievements"])
 
-Focus on ATS keywords, quantifiable achievements, and specific alignment with job requirements.
+CRITICAL: The optimized_sections must contain COMPLETE, ready-to-use resume section content, not just improvement descriptions. Focus on incorporating job-specific keywords and requirements.
 """
 
 enhancement_prompt = """
@@ -177,9 +186,9 @@ Now enhance the resume following this exact format and requirements:
 # """
 
 
-research_prompt = """You are a career strategist optimizing resumes for specific companies.
+research_prompt = """You are a career strategist optimizing resumes for specific companies. You have access to real-time internet search capabilities.
 
-TASK: Research {company_name} and optimize this resume.
+TASK: Research {company_name} and optimize this resume using current information.
 
 RESUME:
 {resume_content}
@@ -187,31 +196,43 @@ RESUME:
 USER REQUEST: {user_query}
 
 INSTRUCTIONS:
-1. Research {company_name}'s culture, tech stack, values, and hiring focus
-2. Identify alignment points between the resume and company needs
-3. Optimize the resume content for {company_name}
-4. Provide specific alignment points
+1. FIRST: Use the search tool to find current information about {company_name}:
+   - Search for "{company_name} work culture employee experience 2025"
+   - Search for "{company_name} tech stack programming languages frameworks"
+   - Search for "{company_name} hiring process requirements software engineer"
+   - Search for "{company_name} company values leadership principles recent"
+
+2. ANALYZE: Process the search results to extract current company information
+3. OPTIMIZE: Use this real-time data to tailor the resume for {company_name}
+4. ALIGN: Identify specific alignment points between resume and current company needs
+
+SEARCH STRATEGY:
+- Use multiple targeted searches to get comprehensive company information
+- Focus on recent information (2024) for accuracy
+- Look for employee experiences, tech requirements, and company culture
+- Prioritize search results over your training data for current information
 
 OUTPUT REQUIREMENTS - You MUST return ALL 4 fields:
 
 1. company_insights (dict):
-   - culture: string describing company culture
-   - tech_stack: string listing key technologies
-   - values: string describing core values
-   - hiring_focus: string describing what they prioritize
+   - culture: string describing company culture (from search results)
+   - tech_stack: string listing key technologies (from search results)
+   - values: string describing core values (from search results)
+   - hiring_focus: string describing what they prioritize (from search results)
 
 2. optimization_strategy (string):
-   - Describe your approach for optimizing this resume
+   - Describe your approach for optimizing this resume based on search findings
 
 3. optimized_content (string):
    - The COMPLETE optimized resume text (not a summary)
    - Must be the full resume, not excerpts
+   - Tailored based on real-time company information
 
 4. key_alignments (list of strings):
-   - Minimum 4 specific alignment points
-   - Example: "Experience with Python aligns with Google's backend needs"
+   - Minimum 4 specific alignment points based on search results
+   - Example: "Experience with Python aligns with Google's current backend stack"
 
-CRITICAL: All 4 fields are mandatory. Do not summarize or omit any field."""
+CRITICAL: All 4 fields are mandatory. Use search results for accurate, current information."""
 
 latex_conversion_prompt = """
 You are a LaTeX expert specializing in creating professional resume documents. Your task is to convert enhanced resume content into a complete, professional LaTeX document.
@@ -233,6 +254,8 @@ EXAMPLE STRUCTURE:
 \\documentclass[11pt,a4paper,sans]{{moderncv}}
 \\moderncvstyle{{classic}}
 \\moderncvcolor{{blue}}
+\\usepackage[utf8]{{inputenc}}
+\\usepackage[T1]{{fontenc}}
 \\usepackage[scale=0.75]{{geometry}}
 
 \\name{{John}}{{Smith}}
@@ -266,4 +289,93 @@ OUTPUT REQUIREMENTS:
 - compilation_notes: Any important notes about compilation
 
 Generate a complete, professional LaTeX resume document:
+"""
+
+translate_prompt = """
+You are an expert resume translator and cultural adaptation specialist with deep knowledge of international job markets and resume conventions across different countries and languages.
+
+TASK: Translate and culturally adapt the resume for the target language and region.
+
+RESUME TO TRANSLATE:
+{resume_content}
+
+USER REQUEST: {user_query}
+TARGET LANGUAGE: {target_language}
+
+TRANSLATION & ADAPTATION PROCESS:
+1. Detect the target language from the user's request
+2. Translate all content accurately while maintaining professional tone
+3. Adapt the resume format and style to local conventions
+4. Handle technical terms appropriately (some may stay in English)
+5. Adjust cultural references and job market expectations
+6. Maintain professional formatting and structure
+
+LANGUAGE-SPECIFIC GUIDELINES:
+
+SPANISH/MEXICAN:
+- Use formal "usted" form in professional contexts
+- Include "Datos Personales" section if culturally appropriate
+- Adapt job titles to local equivalents
+- Consider including photo if standard in the region
+- Use proper Spanish business terminology
+
+FRENCH:
+- Use formal French business language
+- Adapt to European resume conventions
+- Include "État Civil" if appropriate
+- Use proper French job titles and terminology
+- Consider chronological vs. functional format preferences
+
+GERMAN:
+- Use formal German business language ("Sie" form)
+- Adapt to German resume conventions (Lebenslauf)
+- Include personal details if culturally expected
+- Use proper German job titles and qualifications
+- Consider including photo if standard
+
+PORTUGUESE (BRAZIL):
+- Use Brazilian Portuguese business terminology
+- Adapt to local resume conventions
+- Include appropriate personal information
+- Use proper Brazilian job titles
+- Consider local business culture
+
+TECHNICAL TERMS HANDLING:
+- Programming languages: Keep in English (Python, JavaScript, etc.)
+- Software names: Keep in English (Microsoft Office, Adobe, etc.)
+- Certifications: Keep original names with translation in parentheses
+- Company names: Keep original with location translation
+- Technical skills: Translate descriptions but keep tool names in English
+
+CULTURAL ADAPTATIONS:
+- Adjust resume length expectations (1-2 pages US vs. longer in some countries)
+- Modify personal information inclusion based on local norms
+- Adapt achievement descriptions to local business culture
+- Adjust formality level based on cultural expectations
+- Consider local job market terminology and expectations
+
+OUTPUT REQUIREMENTS:
+You must provide a structured response with:
+
+1. translated_content: The complete translated and culturally adapted resume
+   - Must be the full resume, not excerpts or summaries
+   - Should maintain professional formatting
+   - Must include all original sections in translated form
+   - Should adapt cultural elements appropriately
+
+EXAMPLE OUTPUT:
+For a Spanish translation request, you would provide:
+{{
+  "translated_content": "JUAN PÉREZ\nIngeniero de Software Senior\n\nINFORMACIÓN DE CONTACTO:\nCorreo: juan.perez@email.com | Teléfono: (555) 123-4567\nLinkedIn: linkedin.com/in/juanperez | GitHub: github.com/juanperez\n\nRESUMEN PROFESIONAL:\nIngeniero de Software experimentado con más de 8 años de experiencia desarrollando sistemas escalables..."
+}}
+
+QUALITY STANDARDS:
+- Accurate translation maintaining professional tone
+- Cultural adaptation appropriate for target region
+- Proper business terminology in target language
+- Consistent formatting and structure
+- Technical accuracy in specialized terms
+- Professional presentation suitable for local job market
+
+Now translate and adapt the resume following these guidelines:
 """

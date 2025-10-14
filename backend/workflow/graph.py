@@ -7,7 +7,8 @@ from workflow.nodes import (
     classify_intent,
     job_matching_agent,
     enhancement_agent,
-    company_research_agent
+    company_research_agent,
+    translation_agent
 )
 from workflow.edges import route_to_agent
 
@@ -19,6 +20,7 @@ workflow.add_node("classifier", classify_intent)
 workflow.add_node("job_matcher", job_matching_agent)
 workflow.add_node("enhancer", enhancement_agent)
 workflow.add_node("researcher", company_research_agent)
+workflow.add_node("translator", translation_agent)
 
 # Add edges
 workflow.add_edge(START, "classifier")
@@ -28,12 +30,14 @@ workflow.add_conditional_edges(
     {
         "job_matching": "job_matcher",
         "enhancement": "enhancer", 
-        "company_research": "researcher"
+        "company_research": "researcher",
+        "translation": "translator"
     }
 )
 workflow.add_edge("job_matcher", END)
 workflow.add_edge("enhancer", END)
 workflow.add_edge("researcher", END)
+workflow.add_edge("translator", END)
 
 def get_user_config(user_id: str, session_id: str = None):
     """Generate LangGraph config for user session"""

@@ -15,8 +15,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   min-height: 100vh;
+  color: #212529;
 }
 
 .container {
@@ -60,7 +61,7 @@ body {
 }
 
 .logo-icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
   padding: 10px;
   border-radius: 12px;
   color: white;
@@ -69,15 +70,12 @@ body {
 .logo-text h1 {
   font-size: 24px;
   font-weight: bold;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #111827;
 }
 
 .logo-text p {
   font-size: 12px;
-  color: #666;
+  color: #6b7280;
 }
 
 .status {
@@ -100,6 +98,11 @@ body {
   grid-template-columns: 300px 1fr;
   gap: 30px;
   margin-top: 30px;
+  transition: all 0.3s ease;
+}
+
+.main-grid.sidebar-collapsed {
+  grid-template-columns: 1fr;
 }
 
 .sidebar {
@@ -110,6 +113,45 @@ body {
   height: fit-content;
   position: sticky;
   top: 120px;
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1001;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-toggle:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.sidebar-toggle.collapsed {
+  left: 20px;
+}
+
+.sidebar-toggle.expanded {
+  left: 340px;
 }
 
 .upload-area {
@@ -123,13 +165,13 @@ body {
 }
 
 .upload-area:hover {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
+  border-color: #374151;
+  background: rgba(55, 65, 81, 0.05);
 }
 
 .upload-area.drag-active {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
+  border-color: #374151;
+  background: rgba(55, 65, 81, 0.1);
 }
 
 .upload-icon {
@@ -244,7 +286,7 @@ body {
   width: 80px;
   height: 80px;
   margin: 0 auto 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -304,11 +346,11 @@ body {
 }
 
 .message.user .message-avatar {
-  background: #3b82f6;
+  background: #374151;
 }
 
 .message.assistant .message-avatar {
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
 }
 
 .message-bubble {
@@ -319,7 +361,7 @@ body {
 }
 
 .message.user .message-bubble {
-  background: #3b82f6;
+  background: #374151;
   color: white;
 }
 
@@ -344,13 +386,13 @@ body {
 }
 
 .chat-input input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #374151;
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
 }
 
 .send-button {
   padding: 15px 25px;
-  background: #3b82f6;
+  background: #374151;
   color: white;
   border: none;
   border-radius: 15px;
@@ -364,7 +406,7 @@ body {
 }
 
 .send-button:hover {
-  background: #2563eb;
+  background: #1f2937;
 }
 
 .send-button:disabled {
@@ -395,7 +437,7 @@ body {
 }
 
 .quick-action-icon {
-  color: #3b82f6;
+  color: #6b7280;
   margin-bottom: 8px;
 }
 
@@ -415,15 +457,377 @@ body {
 
 .resume-content pre {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.8;
   color: #374151;
   white-space: pre-wrap;
 }
 
+/* Enhanced Agent Response Formatting */
+.agent-response {
+  max-width: none;
+}
+
+.agent-response .message-bubble {
+  max-width: none;
+  width: 100%;
+}
+
+.response-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid #3b82f6;
+}
+
+.response-section h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.response-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.response-section li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+.response-section li:last-child {
+  border-bottom: none;
+}
+
+.response-section li::before {
+  content: "•";
+  color: #3b82f6;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.match-score {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.impact-score {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.enhanced-resume-section {
+  margin-top: 24px;
+  padding: 24px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.enhanced-resume-section h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #3b82f6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.enhanced-resume-content {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1f2937;
+  white-space: pre-wrap;
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.company-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.insight-card {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.insight-card h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.insight-card p {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.expandable-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.expandable-header {
+  background: #f9fafb;
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  color: #374151;
+  transition: background-color 0.2s ease;
+}
+
+.expandable-header:hover {
+  background: #f3f4f6;
+}
+
+.expandable-content {
+  padding: 16px;
+  background: white;
+}
+
+.expandable-content.collapsed {
+  display: none;
+}
+
+/* Custom scrollbar for enhanced content */
+.enhanced-resume-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.enhanced-resume-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.enhanced-resume-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.enhanced-resume-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Markdown styling for resume content */
+.resume-content h1,
+.resume-content h2,
+.resume-content h3,
+.resume-content h4,
+.resume-content h5,
+.resume-content h6,
+.enhanced-resume-content h1,
+.enhanced-resume-content h2,
+.enhanced-resume-content h3,
+.enhanced-resume-content h4,
+.enhanced-resume-content h5,
+.enhanced-resume-content h6 {
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: #1f2937;
+}
+
+.resume-content h1,
+.enhanced-resume-content h1 {
+  font-size: 1.875rem;
+  border-bottom: 2px solid #3b82f6;
+  padding-bottom: 0.5rem;
+}
+
+.resume-content h2,
+.enhanced-resume-content h2 {
+  font-size: 1.5rem;
+  color: #374151;
+}
+
+.resume-content h3,
+.enhanced-resume-content h3 {
+  font-size: 1.25rem;
+  color: #4b5563;
+}
+
+.resume-content p,
+.enhanced-resume-content p {
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
+
+.resume-content ul,
+.resume-content ol,
+.enhanced-resume-content ul,
+.enhanced-resume-content ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.resume-content li,
+.enhanced-resume-content li {
+  margin-bottom: 0.5em;
+  line-height: 1.5;
+}
+
+.resume-content strong,
+.enhanced-resume-content strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.resume-content em,
+.enhanced-resume-content em {
+  font-style: italic;
+  color: #4b5563;
+}
+
+.resume-content blockquote,
+.enhanced-resume-content blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.resume-content code,
+.enhanced-resume-content code {
+  background: #f3f4f6;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.875em;
+  color: #1f2937;
+}
+
+.resume-content pre,
+.enhanced-resume-content pre {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.resume-content hr,
+.enhanced-resume-content hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2rem 0;
+}
+
+/* Version comparison markdown styling */
+.card .ReactMarkdown h1,
+.card .ReactMarkdown h2,
+.card .ReactMarkdown h3,
+.card .ReactMarkdown h4,
+.card .ReactMarkdown h5,
+.card .ReactMarkdown h6 {
+  font-weight: 600;
+  margin-top: 0.75em;
+  margin-bottom: 0.25em;
+  color: #374151;
+}
+
+.card .ReactMarkdown h1 {
+  font-size: 1rem;
+}
+
+.card .ReactMarkdown h2 {
+  font-size: 0.875rem;
+}
+
+.card .ReactMarkdown h3 {
+  font-size: 0.75rem;
+}
+
+.card .ReactMarkdown p {
+  margin-bottom: 0.5em;
+  line-height: 1.4;
+}
+
+.card .ReactMarkdown ul,
+.card .ReactMarkdown ol {
+  margin-bottom: 0.5em;
+  padding-left: 1em;
+}
+
+.card .ReactMarkdown li {
+  margin-bottom: 0.25em;
+  line-height: 1.3;
+}
+
+.card .ReactMarkdown strong {
+  font-weight: 600;
+}
+
+/* Custom scrollbar for version comparison */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox scrollbar styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
 .download-button {
   padding: 12px 25px;
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -438,7 +842,7 @@ body {
 
 .download-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 10px 25px rgba(55, 65, 81, 0.3);
 }
 
 .download-button:disabled {

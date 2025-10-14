@@ -103,33 +103,70 @@ async def chat_endpoint(request: ChatRequest):
 @app.post("/download-latex-pdf")
 async def download_latex_pdf(request: LaTeXDownloadRequest):
     """Convert enhanced resume content to LaTeX and compile to PDF"""
+    import logging
+    import traceback
+    
+    # Set up logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"PDF download request received for filename: {request.filename}")
+        logger.info(f"Content length: {len(request.enhanced_content)}")
+        
         # Check if LaTeX is available
         if not is_latex_available():
+            logger.error("LaTeX is not available on the system")
             raise HTTPException(
                 status_code=500, 
                 detail="LaTeX is not installed on the server. Please install texlive or similar LaTeX distribution."
             )
         
+        logger.info("LaTeX is available, proceeding with chain invocation")
+        
         # Convert enhanced content to LaTeX using LLM
-        latex_chain = latex_conversion_chain()
-        latex_response = latex_chain.invoke({
-            "enhanced_content": request.enhanced_content
-        })
+        try:
+            latex_chain = latex_conversion_chain()
+            logger.info("LaTeX chain created successfully")
+            
+            latex_response = latex_chain.invoke({
+                "enhanced_content": request.enhanced_content
+            })
+            logger.info(f"LaTeX chain invoked successfully, content length: {len(latex_response.latex_content)}")
+            
+        except Exception as chain_error:
+            logger.error(f"Error in LaTeX chain: {str(chain_error)}")
+            logger.error(f"Chain error traceback: {traceback.format_exc()}")
+            raise HTTPException(status_code=500, detail=f"Error in LaTeX chain: {str(chain_error)}")
         
         # Compile LaTeX to PDF
-        pdf_bytes = compile_latex_to_pdf(latex_response.latex_content)
+        try:
+            logger.info("Starting LaTeX compilation")
+            pdf_bytes = compile_latex_to_pdf(latex_response.latex_content)
+            logger.info(f"LaTeX compilation successful, PDF size: {len(pdf_bytes)} bytes")
+            
+        except Exception as compile_error:
+            logger.error(f"Error in LaTeX compilation: {str(compile_error)}")
+            logger.error(f"Compilation error traceback: {traceback.format_exc()}")
+            raise HTTPException(status_code=500, detail=f"Error in LaTeX compilation: {str(compile_error)}")
         
         # Return PDF as download
         filename = f"{request.filename}.pdf"
+        logger.info(f"Returning PDF response with filename: {filename}")
+        
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating LaTeX PDF: {str(e)}")
+        logger.error(f"Unexpected error in PDF download: {str(e)}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error generating PDF: {str(e)}")
 
 @app.get("/health")
 async def health_check():

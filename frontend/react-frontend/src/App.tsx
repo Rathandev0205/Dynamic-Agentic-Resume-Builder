@@ -14,13 +14,17 @@ import {
   CheckCircle,
   AlertCircle,
   Wifi,
-  WifiOff
+  WifiOff,
+  Menu,
+  X
 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import ReactMarkdown from 'react-markdown';
 
 import { sessionManager, SessionData } from './utils/sessionManager';
 import { apiService, fileUtils, connectionChecker } from './services/api';
+import { parseAgentResponse } from './utils/responseParser';
+import StructuredResponse from './components/StructuredResponse';
 
 function App() {
   // State management
@@ -33,6 +37,7 @@ function App() {
   const [isTyping, setIsTyping] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // AbortController for request cancellation
   const [chatAbortController, setChatAbortController] = useState<AbortController | null>(null);
@@ -176,6 +181,77 @@ function App() {
           }
         }
 
+        // If it's a translation, extract and save new version
+        if (response.intent === 'translation' && response.response.includes('--- TRANSLATED RESUME ---')) {
+          try {
+            const translatedContent = response.response
+              .split('--- TRANSLATED RESUME ---')[1]
+              .trim();
+            
+            if (translatedContent) {
+              // Extract target language from the response or user message
+              const languageMatch = response.response.match(/Resume translated to (\w+):/);
+              const targetLanguage = languageMatch ? languageMatch[1] : 'Target Language';
+              
+              updatedSession = sessionManager.addResumeVersion(
+                updatedSession,
+                translatedContent,
+                `Translated to ${targetLanguage}`,
+                [`Resume translated to ${targetLanguage}`, 'Cultural adaptations applied', 'Professional formatting maintained'],
+                response.intent
+              );
+            }
+          } catch (e) {
+            console.warn('Could not extract translated content:', e);
+          }
+        }
+
+        // If it's job matching with optimized resume, extract and save new version
+        if (response.intent === 'job_matching' && response.response.includes('--- JOB-OPTIMIZED RESUME ---')) {
+          try {
+            const optimizedContent = response.response
+              .split('--- JOB-OPTIMIZED RESUME ---')[1]
+              .trim();
+            
+            if (optimizedContent) {
+              updatedSession = sessionManager.addResumeVersion(
+                updatedSession,
+                optimizedContent,
+                `Job-optimized: ${userMessage.substring(0, 50)}...`,
+                ['Resume optimized for job requirements', 'Keywords and skills aligned', 'ATS compatibility improved'],
+                response.intent
+              );
+            }
+          } catch (e) {
+            console.warn('Could not extract job-optimized content:', e);
+          }
+        }
+
+        // If it's company research with optimized resume, extract and save new version
+        if (response.intent === 'company_research' && response.response.includes('--- COMPANY-OPTIMIZED RESUME ---')) {
+          try {
+            const optimizedContent = response.response
+              .split('--- COMPANY-OPTIMIZED RESUME ---')[1]
+              .trim();
+            
+            if (optimizedContent) {
+              // Extract company name from the response
+              const companyMatch = userMessage.match(/(?:for|at|with)\s+([A-Z][a-zA-Z]+)/i);
+              const companyName = companyMatch ? companyMatch[1] : 'Target Company';
+              
+              updatedSession = sessionManager.addResumeVersion(
+                updatedSession,
+                optimizedContent,
+                `Optimized for ${companyName}`,
+                [`Resume tailored for ${companyName}`, 'Company culture alignment', 'Tech stack and values matched'],
+                response.intent
+              );
+            }
+          } catch (e) {
+            console.warn('Could not extract company-optimized content:', e);
+          }
+        }
+
         setSession(updatedSession);
       }
     } catch (error: any) {
@@ -285,16 +361,30 @@ function App() {
         </div>
       </motion.header>
 
+      {/* Sidebar Toggle Button */}
+      <motion.button
+        className={`sidebar-toggle ${sidebarCollapsed ? 'collapsed' : 'expanded'}`}
+        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        {sidebarCollapsed ? <Menu size={20} /> : <X size={20} />}
+      </motion.button>
+
       {/* Main Content */}
       <div className="container">
-        <div className="main-grid">
+        <div className={`main-grid ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
           
           {/* Sidebar */}
           <motion.div 
             initial={{ x: -100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
+            animate={{ 
+              x: sidebarCollapsed ? -100 : 0, 
+              opacity: sidebarCollapsed ? 0 : 1 
+            }}
+            style={{ display: sidebarCollapsed ? 'none' : 'block' }}
           >
-            <div className="sidebar">
+            <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
               
               {/* Upload Section */}
               <div style={{ marginBottom: '32px' }}>
@@ -489,16 +579,17 @@ function App() {
                                 )}
                               </div>
                               
-                              <div className="message-bubble">
-                                <ReactMarkdown>
-                                  {message.content}
-                                </ReactMarkdown>
-                                {message.intent && (
-                                  <div style={{ marginTop: '8px', fontSize: '11px', opacity: 0.7 }}>
-                                    Intent: {message.intent}
-                                  </div>
-                                )}
-                              </div>
+                              {message.role === 'assistant' ? (
+                                <StructuredResponse 
+                                  parsedResponse={parseAgentResponse(message.content, message.intent)} 
+                                />
+                              ) : (
+                                <div className="message-bubble">
+                                  <ReactMarkdown>
+                                    {message.content}
+                                  </ReactMarkdown>
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         ))}
@@ -580,6 +671,7 @@ function App() {
                             { label: 'General Enhancement', message: 'Please enhance my resume overall' },
                             { label: 'Optimize for Google', message: 'Optimize my resume for Google' },
                             { label: 'Match to Job', message: 'Help me match my resume to a specific job description' },
+                            { label: 'Translate to Spanish', message: 'Translate this resume to Spanish' },
                           ].map((action, index) => (
                             <motion.button
                               key={action.label}
@@ -641,9 +733,9 @@ function App() {
 
                           {/* Resume Content */}
                           <div className="resume-content">
-                            <pre>
+                            <ReactMarkdown>
                               {session.resumeContent}
-                            </pre>
+                            </ReactMarkdown>
                           </div>
                         </>
                       ) : (
@@ -686,18 +778,21 @@ function App() {
                               <div style={{ 
                                 background: '#f9fafb', 
                                 borderRadius: '8px', 
-                                padding: '12px', 
-                                maxHeight: '256px', 
-                                overflowY: 'auto' 
+                                padding: '16px', 
+                                maxHeight: '600px', 
+                                overflowY: 'auto',
+                                border: '1px solid #e5e7eb'
                               }} className="custom-scrollbar">
-                                <pre style={{ 
-                                  whiteSpace: 'pre-wrap', 
-                                  fontSize: '12px', 
+                                <div style={{ 
+                                  fontSize: '14px', 
                                   color: '#374151',
-                                  margin: 0
+                                  margin: 0,
+                                  lineHeight: '1.6'
                                 }}>
-                                  {version.content.substring(0, 500)}...
-                                </pre>
+                                  <ReactMarkdown>
+                                    {version.content}
+                                  </ReactMarkdown>
+                                </div>
                               </div>
                             </motion.div>
                           ))}
