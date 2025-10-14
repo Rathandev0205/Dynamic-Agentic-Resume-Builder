@@ -70,13 +70,13 @@ export interface HealthResponse {
 // API Functions
 export const apiService = {
   // Health check
-  async checkHealth(): Promise<HealthResponse> {
-    const response = await api.get<HealthResponse>('/health');
+  async checkHealth(signal?: AbortSignal): Promise<HealthResponse> {
+    const response = await api.get<HealthResponse>('/health', { signal });
     return response.data;
   },
 
   // Upload resume file
-  async uploadResume(file: File): Promise<UploadResponse> {
+  async uploadResume(file: File, signal?: AbortSignal): Promise<UploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -84,21 +84,23 @@ export const apiService = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+      signal,
     });
 
     return response.data;
   },
 
   // Send chat message
-  async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
-    const response = await api.post<ChatResponse>('/chat', request);
+  async sendChatMessage(request: ChatRequest, signal?: AbortSignal): Promise<ChatResponse> {
+    const response = await api.post<ChatResponse>('/chat', request, { signal });
     return response.data;
   },
 
   // Download professional PDF
-  async downloadProfessionalPDF(request: LaTeXDownloadRequest): Promise<Blob> {
+  async downloadProfessionalPDF(request: LaTeXDownloadRequest, signal?: AbortSignal): Promise<Blob> {
     const response = await api.post('/download-latex-pdf', request, {
       responseType: 'blob',
+      signal,
     });
 
     return response.data;

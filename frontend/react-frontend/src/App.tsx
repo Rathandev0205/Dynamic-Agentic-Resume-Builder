@@ -33,6 +33,9 @@ function App() {
   const [isTyping, setIsTyping] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
+  
+  // AbortController for request cancellation
+  const [chatAbortController, setChatAbortController] = useState<AbortController | null>(null);
 
   // Initialize session on component mount
   useEffect(() => {
@@ -106,26 +109,41 @@ function App() {
     multiple: false,
   });
 
-  // Chat handling
+  // Chat handling with AbortController
   const handleSendMessage = async () => {
-    if (!chatInput.trim() || !session || isLoading) return;
+    if (!chatInput.trim() || !session || isLoading || isTyping) return;
+
+    // Cancel any existing request
+    if (chatAbortController) {
+      chatAbortController.abort();
+    }
+
+    // Create new AbortController for this request
+    const newAbortController = new AbortController();
+    setChatAbortController(newAbortController);
 
     const userMessage = chatInput.trim();
+    
+    // Clear input and set states
     setChatInput('');
     setError(null);
     setIsTyping(true);
 
-    // Add user message to session
+    // Add user message to session immediately
     let updatedSession = sessionManager.addMessage(session, 'user', userMessage);
     setSession(updatedSession);
 
     try {
+      console.log('Sending chat message:', userMessage);
+      
       const response = await apiService.sendChatMessage({
-        user_id: session.userId,
-        session_id: session.sessionId,
+        user_id: updatedSession.userId,
+        session_id: updatedSession.sessionId,
         message: userMessage,
-        resume_content: session.resumeContent,
-      });
+        resume_content: updatedSession.resumeContent,
+      }, newAbortController.signal);
+
+      console.log('Chat response received:', response);
 
       if (response.success) {
         // Add assistant response
@@ -160,10 +178,18 @@ function App() {
 
         setSession(updatedSession);
       }
-    } catch (error) {
-      setError(apiService.handleApiError(error));
+    } catch (error: any) {
+      // Don't show error if request was aborted
+      if (error.name !== 'AbortError' && !newAbortController.signal.aborted) {
+        console.error('Chat error:', error);
+        setError(apiService.handleApiError(error));
+      }
     } finally {
-      setIsTyping(false);
+      // Only clear typing if this is still the active request
+      if (!newAbortController.signal.aborted) {
+        setIsTyping(false);
+        setChatAbortController(null);
+      }
     }
   };
 
