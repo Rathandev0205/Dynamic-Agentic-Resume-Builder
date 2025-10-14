@@ -39,7 +39,7 @@ An intelligent resume optimization platform that uses AI agents to enhance, tran
 ## 🏗️ Architecture
 
 ### System Architecture
-![System Architecture](Images/system-architecture.png)
+![System Architecture](Images/backend-arch.png)
 
 The platform follows a modular architecture with clear separation of concerns:
 - **Frontend**: React-based UI with session management
@@ -48,7 +48,7 @@ The platform follows a modular architecture with clear separation of concerns:
 - **External Services**: AWS Bedrock, Tavily Search, LaTeX compiler
 
 ### User Flow
-![User Flow](Images/user-flow.png)
+![User Flow](Images/userflow.png)
 
 The user journey is streamlined for optimal experience:
 1. Upload resume (PDF/DOCX)
@@ -57,7 +57,7 @@ The user journey is streamlined for optimal experience:
 4. Download professional PDFs
 
 ### Agent Workflow
-![Agent Workflow](Images/agent-workflow.png)
+![Agent Workflow](Images/agentic-workflow.png)
 
 Each agent follows a specialized workflow:
 - **Intent Classification**: Routes user queries to appropriate agents
