@@ -39,7 +39,7 @@ An intelligent resume optimization platform that uses AI agents to enhance, tran
 ## 🏗️ Architecture
 
 ### System Architecture
-![System Architecture](Images/backend-arch.png)
+![System Architecture](Images/backend_arch.png)
 
 The platform follows a modular architecture with clear separation of concerns:
 - **Frontend**: React-based UI with session management
@@ -57,7 +57,7 @@ The user journey is streamlined for optimal experience:
 4. Download professional PDFs
 
 ### Agent Workflow
-![Agent Workflow](Images/agentic-workflow.png)
+![Agent Workflow](Images/agentic_workflow.png)
 
 Each agent follows a specialized workflow:
 - **Intent Classification**: Routes user queries to appropriate agents
